@@ -34,9 +34,12 @@ If the website needs a storage (faces), the storage with the same timestamp as t
 
 The import-driver can be downloaded from [https://bitmanager.nl/distrib/importer.zip](https://bitmanager.nl/distrib/importer.zip).
 
-Install elasticsearch.
+**Install** elasticsearch.
+If you want to use the bitmanager stemmer, please install version 7.4, since the bitmanager plugin is not yet available for later versions.
+The needed plugin is downloadable from [](https://bitmanager.nl/es/7.4.0/).
+If you choose to use a different version, the standard `index.config.js` will not work. Take a look at the `index_without_stemmer.config.js` file.
 
-Create a following files by copying their *.sample counterparts and adjust the content according your needs:
+**Create** a following files by copying their *.sample counterparts and adjust the content according your needs:
 
 - import.xml
 - facenames.txt
@@ -48,7 +51,7 @@ In case of any problems, make use of importsettings.xml to control the album-nam
 
 Maybe you can remove duplicates from your collection, rename things, put photo's together in a directory, etc. After that, you can redo these initial steps.
 
-Finally start the other steps one-by-one. This will take a long time if you have lots of photo's. With the sleep_after_extract in place, and 30K photo's, the generation of captions will exceed 24 hours. OCR is slightly faster and face extraction will take hours.
+**Finally** start the other steps one-by-one. This will take a long time if you have lots of photo's. With the sleep_after_extract in place, and 30K photo's, the generation of captions will exceed 24 hours. OCR is slightly faster and face extraction will take hours.
 
 #### Face stamping
 
@@ -177,7 +180,7 @@ There are 2 hiding modes:
 
 
 
-#### Controling meta information via importsettings.xml
+#### Controlling meta information via importsettings.xml
 
 If a directory contains the file importsettings.xml, the meta extraction is done as specified in the file.
 
