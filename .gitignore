@@ -1,0 +1,26 @@
+### visual studio files
+
+*.cache
+*.suo
+*.vshost*
+*.user
+*.dll.refresh
+*.vsmdi
+
+
+Thumbs.db
+**/obj/**
+**/temp/**
+**/bin/**
+**/logs/**
+**/sav/**
+.vs/**
+packages/**
+*.FileListAbsolute.txt
+*.generated.txt
+_*.meta
+
+
+*.old
+*.tmp
+*.bak

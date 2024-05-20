@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+      <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+      <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+      <OutputType>Library</OutputType>
+      <TargetFramework>net6.0-windows</TargetFramework>
+      <Nullable>disable</Nullable>
+      <UseWindowsForms>false</UseWindowsForms>
+      <ImplicitUsings>enable</ImplicitUsings>
+      <AssemblyName>AlbumImporter</AssemblyName>
+      <RootNamespace>AlbumImporter</RootNamespace>
+      <NoWarn>$(NoWarn);CA1416</NoWarn>
+   </PropertyGroup>
+
+   <ItemGroup>
+     <PackageReference Include="FaceAiSharp" Version="0.5.23" />
+     <PackageReference Include="FaceAiSharp.Bundle" Version="0.5.23" />
+     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.17.3" />
+     <PackageReference Include="Microsoft.ML.OnnxRuntime.Managed" Version="1.17.3" />
+     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
+     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+   </ItemGroup>
+
+   <ItemGroup>
+     <Reference Include="bmcore102">
+       <HintPath>..\..\..\Bitmanager\_References\BMCore102.dll</HintPath>
+       <SpecificVersion>False</SpecificVersion>
+     </Reference>
+     <Reference Include="BMElastic200">
+       <HintPath>..\..\..\Bitmanager\_References\BMElastic200.dll</HintPath>
+        <SpecificVersion>False</SpecificVersion>
+     </Reference>
+     <Reference Include="BMGps200">
+       <HintPath>..\..\..\Bitmanager\_References\BMGps200.dll</HintPath>
+        <SpecificVersion>False</SpecificVersion>
+     </Reference>
+     <Reference Include="BMHttp200">
+       <HintPath>..\..\..\Bitmanager\_References\BMHttp200.dll</HintPath>
+        <SpecificVersion>False</SpecificVersion>
+     </Reference>
+     <Reference Include="BMImage102">
+       <HintPath>..\..\..\Bitmanager\_References\BMImage102.dll</HintPath>
+        <SpecificVersion>False</SpecificVersion>
+     </Reference>
+     <Reference Include="bmir100">
+       <HintPath>..\..\..\Bitmanager\_References\bmir100.dll</HintPath>
+        <SpecificVersion>False</SpecificVersion>
+     </Reference>
+     <Reference Include="bmOcr100">
+       <HintPath>..\..\..\Bitmanager\_References\bmOcr100.dll</HintPath>
+        <SpecificVersion>False</SpecificVersion>
+     </Reference>
+     <Reference Include="BMWebService200">
+       <HintPath>..\..\..\Bitmanager\_References\BMWebService200.dll</HintPath>
+        <SpecificVersion>False</SpecificVersion>
+     </Reference>
+     <Reference Include="ImportPipeline">
+       <HintPath>..\..\..\Bitmanager\_References\ImportPipeline.dll</HintPath>
+        <SpecificVersion>False</SpecificVersion>
+     </Reference>
+   </ItemGroup>
+
+</Project>

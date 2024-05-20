@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<root importflags="" bindir="AlbumImporter\bin\Debug\net6.0-windows" log_progress="1m">
+   $$#define SERVER=localhost$$
+
+   $$#define ALBUM_IDS=http://bm2:9200/album-ids$$
+   $$#define EXISTING_CAPTIONS=http://bm2:9200/album-captions$$
+   $$#define EXISTING_OCR=http://bm2:9200/album-ocr$$
+   $$#define EXISTING_TRACKS=http://bm2:9200/album-tracks$$
+   $$#define EXTERNAL_TRACKS=http://bm2:9200/tracks$$
+   $$#define EXISTING_FACES=http://bm2:9200/album-faces$$
+
+   <endpoints>
+      <endpoint name="es" type="ESEndpoint" url="http://$$server$$:9200/" debug="true" active="lazy" cache="100" maxparallel="2">
+         <index name="album" indexname="album" config="index.config.js" generations="3" >
+            <type name="_doc" />
+         </index>
+         <index name="ids" indexname="album-ids" config="index_ids.config.js" generations="1" >
+            <type name="_doc" />
+         </index>
+         <index name="ocr" indexname="album-ocr" config="index_ocr.config.js" generations="3" >
+            <type name="_doc" />
+         </index>
+         <index name="captions" indexname="album-captions" config="index_captions.config.js" generations="3" >
+            <type name="_doc" />
+         </index>
+         <index name="tracks" indexname="album-tracks" config="" generations="1" >
+            <type name="_doc" />
+         </index>
+         <index name="faces" indexname="album-faces" config="index_faces.config.js" generations="3" >
+            <type name="_doc" />
+         </index>
+      </endpoint>
+   </endpoints>
+
+   <processes>
+      <process name='caption' maxrestarts="2" log="python" errlog="python_err" logfrom="python" clearlogs="false">
+         <exe>C:\Python\310\python.exe</exe>
+         <arguments>"%IMPORT_ROOT%\CaptionService\server.py"</arguments>
+         <shutdown url="http://localhost:5000/shutdown" method="GET" />
+         <ping url="http://localhost:5000/ping" max_wait_time="20s" />
+      </process>
+   </processes>
+
+
+   <pipelines>
+      <pipeline name="photos" endpoint="es.album._doc" script="AlbumImporter.dll#AlbumImporter.ImportScript_Photos"  >
+         <action key="_datasource/_start" script="OnDatasourceStart" />
+         <action key="_datasource/_stop" script="OnDatasourceEnd"  />
+         <action key="_item/_error" script="OnError"/>
+         <action key="record" type="add" script="OnPhoto" />
+      </pipeline>
+      <pipeline name="ids" endpoint="es.ids._doc"  script="AlbumImporter.dll#AlbumImporter.ImportScript_Ids"  >
+         <action key="record" type="add" script="OnId"/>
+      </pipeline>
+      <pipeline name="ocr" endpoint="es.ocr._doc"  script="AlbumImporter.dll#AlbumImporter.ImportScript_Ocr"  >
+         <action key="_datasource/_start" script="OnDatasourceStart" />
+         <action key="_item/_error" script="OnError"/>
+         <action key="record" type="add" script="OnId"/>
+      </pipeline>
+      <pipeline name="captions" endpoint="es.captions._doc"  script="AlbumImporter.dll#AlbumImporter.ImportScript_Captions"  >
+         <action key="_datasource/_start" script="OnDatasourceStart" />
+         <action key="_item/_error" script="OnError"/>
+         <action key="record" type="add" script="OnId"/>
+      </pipeline>
+      <pipeline name="tracks" endpoint="es.tracks._doc"  script="AlbumImporter.dll#AlbumImporter.ImportScript_Tracks"  >
+         <action key="_datasource/_start" script="OnDatasourceStart"  url="$$EXTERNAL_TRACKS$$"/>
+         <action key="record" type="add"/>
+      </pipeline>
+      <pipeline name="face_extract" endpoint="es.faces._doc"  script="AlbumImporter.dll#AlbumImporter.ImportScript_FaceExtract"  >
+         <action key="_datasource/_start" script="OnDatasourceStart" />
+         <action key="_datasource/_stop" script="OnDatasourceEnd" />
+         <action key="_item/_error" script="OnError"/>
+         <action key="record" script="OnId"/>
+         <action key="record/face" type="add"/>
+      </pipeline>
+      <pipeline name="face_match" endpoint="es.faces._doc"  script="AlbumImporter.dll#AlbumImporter.ImportScript_FaceMatcher"  >
+         <action key="_datasource/_start" script="OnDatasourceStart" />
+         <action key="_datasource/_stop" script="OnDatasourceEnd" />
+         <action key="_item/_error" script="OnError"/>
+         <action key="record" type="add"/>
+      </pipeline>
+   </pipelines>
+
+   <datasources>
+      <datasource name="ids" active="false" type="importPipeline#FileNameDatasource">
+         <provider type="FileStreamDirectory" virtualroot="P" user="peter" root="e:\fotos\peter" sort="filename|asc" filter="\.jpg$" recursive="true">
+            <dir excl="some regex expression"/>
+         </provider>
+         <provider type="FileStreamDirectory" virtualroot="W" user="wim" root="e:\fotos\wim" sort="filename|asc" filter="\.jpg$" recursive="true">
+            <dir excl="some regex expression"/>
+         </provider>
+      </datasource>
+
+      <datasource name="ocr" active="false" type="AlbumImporter.dll#AlbumImporter.IDDatasource" url="$$ALBUM_IDS$$" sleep_after_extract="50">
+         <ocr tessdata="TessData" languages="nld+eng" />
+      </datasource>
+
+      <datasource name="captions" active="false" type="AlbumImporter.dll#AlbumImporter.IDDatasource" url="$$ALBUM_IDS$$" sleep_after_extract="50">
+      </datasource>
+
+      <datasource name="face_extract" active="false" _filter="drachten" type="AlbumImporter.dll#AlbumImporter.IDDatasource" url="$$ALBUM_IDS$$" sleep_after_extract="50">
+      </datasource>
+
+      <datasource name="face_match" active="false" type="NopDatasource" log_progress="10s">
+      </datasource>
+
+
+      <datasource name="tracks" active="false" type="NopDatasource" />
+
+      <datasource name="photos" active="false" type="AlbumImporter.dll#AlbumImporter.IDDatasource" url="$$ALBUM_IDS$$" >
+         <ocr         url="$$EXISTING_OCR$$" />
+         <captions    url="$$EXISTING_CAPTIONS$$" />
+         <trackphotos url="$$EXISTING_TRACKS$$" />
+         <faces       url="$$EXISTING_FACES$$" />
+      </datasource>
+   </datasources>
+
+   <roots>
+      <root name="P" dir="E:\fotos\peter" />
+      <root name="W" dir="E:\fotos\wim" />
+   </roots>
+   <faces_admin dir="." />
+
+</root>
