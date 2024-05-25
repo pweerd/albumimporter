@@ -24,39 +24,39 @@
 
    <ItemGroup>
      <Reference Include="bmcore102">
-       <HintPath>..\..\..\Bitmanager\_References\BMCore102.dll</HintPath>
+       <HintPath>..\_References\BMCore102.dll</HintPath>
        <SpecificVersion>False</SpecificVersion>
      </Reference>
      <Reference Include="BMElastic200">
-       <HintPath>..\..\..\Bitmanager\_References\BMElastic200.dll</HintPath>
+       <HintPath>..\_References\BMElastic200.dll</HintPath>
         <SpecificVersion>False</SpecificVersion>
      </Reference>
      <Reference Include="BMGps200">
-       <HintPath>..\..\..\Bitmanager\_References\BMGps200.dll</HintPath>
+       <HintPath>..\_References\BMGps200.dll</HintPath>
         <SpecificVersion>False</SpecificVersion>
      </Reference>
      <Reference Include="BMHttp200">
-       <HintPath>..\..\..\Bitmanager\_References\BMHttp200.dll</HintPath>
+       <HintPath>..\_References\BMHttp200.dll</HintPath>
         <SpecificVersion>False</SpecificVersion>
      </Reference>
      <Reference Include="BMImage102">
-       <HintPath>..\..\..\Bitmanager\_References\BMImage102.dll</HintPath>
+       <HintPath>..\_References\BMImage102.dll</HintPath>
         <SpecificVersion>False</SpecificVersion>
      </Reference>
      <Reference Include="bmir100">
-       <HintPath>..\..\..\Bitmanager\_References\bmir100.dll</HintPath>
+       <HintPath>..\_References\bmir100.dll</HintPath>
         <SpecificVersion>False</SpecificVersion>
      </Reference>
      <Reference Include="bmOcr100">
-       <HintPath>..\..\..\Bitmanager\_References\bmOcr100.dll</HintPath>
+       <HintPath>..\_References\bmOcr100.dll</HintPath>
         <SpecificVersion>False</SpecificVersion>
      </Reference>
      <Reference Include="BMWebService200">
-       <HintPath>..\..\..\Bitmanager\_References\BMWebService200.dll</HintPath>
+       <HintPath>..\_References\BMWebService200.dll</HintPath>
         <SpecificVersion>False</SpecificVersion>
      </Reference>
      <Reference Include="ImportPipeline">
-       <HintPath>..\..\..\Bitmanager\_References\ImportPipeline.dll</HintPath>
+       <HintPath>..\_References\ImportPipeline.dll</HintPath>
         <SpecificVersion>False</SpecificVersion>
      </Reference>
    </ItemGroup>

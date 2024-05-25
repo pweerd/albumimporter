@@ -53,6 +53,8 @@ Maybe you can remove duplicates from your collection, rename things, put photo's
 
 **Finally** start the other steps one-by-one. This will take a long time if you have lots of photo's. With the sleep_after_extract in place, and 30K photo's, the generation of captions will exceed 24 hours. OCR is slightly faster and face extraction will take hours.
 
+
+
 #### Face stamping
 
 After generating all the indexes, start the 'faces' page in the website and start stamping known faces. Typically stamp +-5 faces per person, and run the the match step. Then restart the faces page and correct failures. By searching for 'name:"some name"', you can see all the faces that were assigned to this person. Manual assigned faces can be seen by querying for 'src:M'. The ID of a photo and names, etc is put in the txt field and is searchable from the UI.
@@ -60,6 +62,11 @@ After generating all the indexes, start the 'faces' page in the website and star
 #### Regenerating the main index
 
 Now rerun a full import of the photo's. The generated data will be mixed together with the meta info from the photo.
+
+#### Compilation
+
+Make sure you have a sub-folder '_references' in your solutions folder. This can be a junction to a common folder (see `@CreateRefsLink`) or a real folder.
+All needed references can be found from the zip that is supplied in the release.
 
 
 
@@ -97,7 +104,7 @@ The generation of captions is a lengthy process that easily cost more than a day
 
 Facerecognition is done via FaceAiSharp, which uses a network from arcface. 
 
-If you get following error:
+If you get following error (especially after compilation):
 
 ```Unable to find an entry point named 'OrtGetApiBase' in DLL 'onnxruntime'
 Unable to find an entry point named 'OrtGetApiBase' in DLL 'onnxruntime'
