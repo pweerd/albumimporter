@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <root importflags="" bindir="AlbumImporter\bin\Debug\net6.0-windows" log_progress="1m">
-   $$#define SERVER=localhost$$
+   $$#define SERVER=http://localhost:9200$$
 
-   $$#define ALBUM_IDS=http://bm2:9200/album-ids$$
-   $$#define EXISTING_CAPTIONS=http://bm2:9200/album-captions$$
-   $$#define EXISTING_OCR=http://bm2:9200/album-ocr$$
-   $$#define EXISTING_TRACKS=http://bm2:9200/album-tracks$$
-   $$#define EXTERNAL_TRACKS=http://bm2:9200/tracks$$
-   $$#define EXISTING_FACES=http://bm2:9200/album-faces$$
+   $$#define ALBUM_IDS=$$SERVER$$/album-ids$$
+   $$#define EXISTING_CAPTIONS=$$SERVER$$/album-captions$$
+   $$#define EXISTING_OCR=$$SERVER$$/album-ocr$$
+   $$#define EXISTING_TRACKS=$$SERVER$$/album-tracks$$
+   $$#define EXTERNAL_TRACKS=$$SERVER$$/tracks$$
+   $$#define EXISTING_FACES=$$SERVER$$/album-faces$$
 
    <endpoints>
-      <endpoint name="es" type="ESEndpoint" url="http://$$server$$:9200/" debug="true" active="lazy" cache="100" maxparallel="2">
+      <endpoint name="es" type="ESEndpoint" url="$$server$$/" debug="true" active="lazy" cache="100" maxparallel="2">
          <index name="album" indexname="album" config="index.config.js" generations="3" >
             <type name="_doc" />
          </index>
