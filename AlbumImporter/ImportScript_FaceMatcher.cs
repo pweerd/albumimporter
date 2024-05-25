@@ -38,7 +38,7 @@ namespace AlbumImporter {
 
          logger.Log ("Fetching existing faces");
          string url = base.copyFromUrl;
-         if (url == null && !fullImport) url = base.oldIndexUrl;
+         if (url == null) url = base.oldIndexUrl;
          existingFaces = new FaceCollection (ctx.ImportLog, url).GetFaces();
 
          logger.Log ("Loading storages");
@@ -61,8 +61,11 @@ namespace AlbumImporter {
          handleExceptions = true;
 
          var ep = ctx.Action.Endpoint;
-         if (fullImport) {  //Full import: we need to emit *all* records and copy *all* embeddings/face-imgs
+         if (fullImport) {  //Full import: we need to emit *all* records and copy *all* face-imgs
+            var idSet = fetchAllIds();
             foreach (var f in existingFaces) {
+               var mainId = getMainId (f.Id);
+               if (!idSet.Contains (mainId)) continue;
                if (f.NameSrc == NameSource.Error || f.NameSrc == NameSource.Manual) {
                   goto EMIT_FACE_FULL;
                }
@@ -136,7 +139,6 @@ namespace AlbumImporter {
          return null;
       }
 
-
       public object OnDatasourceEnd (PipelineContext ctx, object value) {
          handleExceptions = false;
          ctx.ImportLog.Log ("Closing storage file(s)");
@@ -190,6 +192,20 @@ namespace AlbumImporter {
          return new KnownFaces (hlp, list);
       }
 
+      private HashSet<string> fetchAllIds () {
+         var idReq = esConnection.CreateSearchRequest ("album-ids");
+         idReq.SetSource ("id", null);
+         var idEnum = new ESRecordEnum (idReq);
+         var set = new HashSet<string> ();
+         foreach (var doc in idEnum) set.Add (doc.ReadStr("id"));
+         return set;
+      }
+
+
+      private string getMainId (string id) {
+         int ix = id.LastIndexOf ('~');
+         return ix < 0 ? id : id.Substring (0, ix);
+      }
 
    }
 
