@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root importflags="" bindir="..\..\bin\Debug\net6.0-windows" log_progress="1m">
+
+   <endpoints>
+      <endpoint name="photos" type="output" normalize="true" />
+   </endpoints>
+
+   <pipelines>
+      <pipeline name="photos" script="AlbumImporter.dll#AlbumImporter.ImportScript_Photos"  >
+         <action key="_datasource/_start" script="OnDatasourceStart" />
+         <action key="_datasource/_stop" script="OnDatasourceEnd"  />
+         <action key="_item/_error" script="OnError"/>
+         <action key="record" type="add" script="OnPhoto" />
+      </pipeline>
+   </pipelines>
+
+   <datasources>
+      <datasource name="photos" active="true" type="AlbumImporter.dll#AlbumImporter.IDDatasource" >
+        <id value="id" file="" />
+        <ocr         url="" />
+        <captions    url="" />
+        <trackphotos url="" />
+        <faces       url="" />
+      </datasource>
+   </datasources>
+
+   <roots>
+      <root name="D" dir="D:\Fotos\" />
+   </roots>
+   <faces_admin dir="." />
+
+</root>
