@@ -39,6 +39,7 @@ namespace AlbumImporter {
 
 
    public class ImportScript_Photos: ImportScriptBase {
+      const string WHATSAPP = "WhatsApp";
       private static readonly Dictionary<string, int> albumIDs = new Dictionary<string, int> ();
       private readonly FileMetaExtractor extractor = new FileMetaExtractor ();
       private DirectorySettingsCache settingsCache = new DirectorySettingsCache (null);
@@ -70,7 +71,7 @@ namespace AlbumImporter {
       public object OnDatasourceStart (PipelineContext ctx, object value) {
          const _XmlRawMode mandatory = _XmlRawMode.EmptyToNull | _XmlRawMode.ExceptNullValue;
 
-         Init (ctx, true);
+         Init (ctx, false);
          var ds = (DatasourceAdmin)value;
          var settingsNode = ds.ContextNode.SelectSingleNode ("settings");
          settingsCache = new DirectorySettingsCache (settingsNode == null ? null : new DirectorySettings (settingsNode, null));
@@ -228,6 +229,16 @@ namespace AlbumImporter {
          if (dirSettings.ForcedDate != DateTime.MinValue) date = dirSettings.ForcedDate;
          if (date == DateTime.MinValue) date = extractor.Date;
 
+         //Tag whatsapp images and optional replace the album name
+         if (whatsapp) {
+            album = replaceAlbumForWhatsapp (relName, album);
+            date = replaceDateForWhatsapp (date);
+            if (camera == null) {
+               rec["camera"] = camera = WHATSAPP;
+            }
+         }
+
+
          int y, m, d;
          if (date == DateTime.MinValue) {
             rec["sort_key"] = getAlbumId(album) * YEAR_MULTIPLIER + extractor.Order;
@@ -248,14 +259,6 @@ namespace AlbumImporter {
          rec["year"] = y;
          rec["month"] = m;
          rec["day"] = d;
-
-         //Tag whatsapp images
-         if (whatsapp) {
-            album = "WhatsApp";
-            if (camera == null) {
-               rec["camera"] = camera = "WhatsApp";
-            }
-         }
 
          var sb = new StringBuilder ();
          sb.Append ('[').Append (y).Append (']');
@@ -329,8 +332,6 @@ namespace AlbumImporter {
          tokens.Clear ();
          hnyms = hypernymCollector.Collect (hnyms, tokenizer.Tokenize (tokens, sb.ToString()), false);
          hypernymCollector.ToString (sb, hnyms);
-         //if (addedHypernymText.Contains("groep kinderen") && addedHypernymText.Contains ("groep kinderen"))
-
 
          rec["text"] = sb.ToString ();
 
@@ -351,10 +352,54 @@ namespace AlbumImporter {
          return null;
       }
 
+      /// <summary>
+      /// If the album names seems to be more or less the filename, without a date/time prefix,
+      /// we replace the album by 'WhatsApp'
+      /// </summary>
+      private static string replaceAlbumForWhatsapp (string relname, string album) {
+         string fn = Path.GetFileNameWithoutExtension (relname);
+         int ix = fn.IndexOf (album, StringComparison.InvariantCultureIgnoreCase);
+         if (ix <= 0) return WHATSAPP;
+         for (int i = 0; i < ix; i++) {
+            int ch = fn[i];
+            if (ch >= '0' && ch <= '9') continue;
+            switch (ch) {
+               case ' ':
+               case '-':
+               case '_': continue;
+            }
+            return WHATSAPP;
+         }
+         return album;
+      }
+
+      /// <summary>
+      /// For photo's coming from whatsapp, we replace the date by the file date
+      /// We prefer manual assigned dates when they are specific enough
+      /// (to prevent wrong assignment due to editing)
+      /// </summary>
+      private DateTime replaceDateForWhatsapp (DateTime org) {
+         if (org == DateTime.MinValue) goto RET_FILEDATE;
+         var local = org.ToLocalTimeAssumeLocalIfUns ();
+         if (local.Hour == 0 && local.Minute == 0 && local.Second == 0) {
+            var local2 = idInfo.DateUtc.ToLocalTime ();
+            if (local2.Year != local.Year) goto RET_ORGDATE;
+            if (local2.Month != local.Month) {
+               if (local.Month==1 && local.Day==1) goto RET_FILEDATE;
+               goto RET_ORGDATE;
+            } 
+            if (local2.Day == local.Day) goto RET_FILEDATE;
+            if (local.Day == 1) goto RET_FILEDATE;
+         }
+      RET_ORGDATE: return org;
+
+      RET_FILEDATE: return idInfo.DateUtc;
+      }
+
 
       private void addFaces(JsonObjectValue rec, string id) {
          int i = findFirstFace (id);
-         if (i < 0) goto NO_NAMES;
+         if (i >= faces.Count) goto NO_NAMES;
 
          var face = faces[i];
          if (face.FaceCount == 0) goto NO_NAMES;
