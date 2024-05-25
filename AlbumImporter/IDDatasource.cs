@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Runtime;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -42,6 +43,12 @@ namespace AlbumImporter {
          User = src.ReadStr ("user");
          DateUtc = src.ReadDate ("date");
       }
+      public IdInfo (string id, string user, string file) {
+         Id = id;
+         FileName = file;
+         User = user;
+         DateUtc = File.GetLastWriteTimeUtc (file);
+      }
 
       public override string ToString () {
          return FileName;
@@ -51,15 +58,20 @@ namespace AlbumImporter {
    public class IDDatasource : Datasource {
       private RootReplacer rootReplacer;
       private Regex filter;
+      private string fixedFile;
       private string url;
       private int bufferSize;
       private int sleepTime;
       public void Import (PipelineContext ctx, IDatasourceSink sink) {
+         var p = ctx.Pipeline;
+         var repl = rootReplacer;
+         if (fixedFile != null) {
+            p.HandleValue (ctx, "record", new IdInfo("dummy\\"+Path.GetFileName(fixedFile), "dummy", fixedFile));
+            return;
+         }
          var req = Utils.CreateESRequest (url);
          req.Sort.Add (new ESSortField ("id.keyword", ESSortDirection.asc));
 
-         var p = ctx.Pipeline;
-         var repl = rootReplacer;
          var e = new ESRecordEnum (req, bufferSize, "15m");
          e.Async = true;
          foreach (var rec in e) {
@@ -73,6 +85,9 @@ namespace AlbumImporter {
 
       public void Init (PipelineContext ctx, XmlNode node) {
          rootReplacer = Utils.CreateRootReplacer (node);
+         fixedFile = node.ReadStr ("id/@file", null);
+         if (fixedFile != null) return;
+
          url = node.ReadStr ("@url");
          bufferSize = node.ReadInt ("@buffersize", ESRecordEnum.DEF_BUFFER_SIZE);
          sleepTime = node.ReadInt ("@sleep_per_record", 0);
